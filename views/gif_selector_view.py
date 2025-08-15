@@ -27,5 +27,5 @@ class GifSelect(discord.ui.Select):
 
 class GifView(discord.ui.View):
     def __init__(self, target_message: discord.Message):
-        super().__init__(timeout=300)
+        super().__init__(timeout=30)
         self.add_item(GifSelect(target_message))

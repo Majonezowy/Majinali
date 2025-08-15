@@ -3,3 +3,7 @@ __pycache__
 .vscode
 .venv
 list events
+
+*.old
+*.db
+bot_data.db

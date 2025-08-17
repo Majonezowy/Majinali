@@ -1,19 +1,18 @@
 import discord
+from views.ticket_category_select_view import TicketCategoryView
 
 class HelpView(discord.ui.View):
     def __init__(self):
         super().__init__(timeout=None)
 
-        self.add_item(discord.ui.Button(
+        button = discord.ui.Button(
             style=discord.ButtonStyle.green,
-            label="A Green Button",
-            custom_id="help_green_button"
-        ))
+            label="Stworz ticket",
+            custom_id="create_ticket_button"
+        )
+        button.callback = self.create_ticket_button_callback
+        self.add_item(button)
 
-    @discord.ui.button(
-        style=discord.ButtonStyle.blurple,
-        label="Another Button",
-        custom_id="help_blue_button"
-    )
-    async def another_button_callback(self, interaction: discord.Interaction, button: discord.ui.Button):
-        await interaction.response.send_message("You clicked the blue button!", ephemeral=True)
+    async def create_ticket_button_callback(self, interaction: discord.Interaction):
+        embed = discord.Embed(title="Wybierz kategorię:")
+        await interaction.response.send_message(embed=embed, view=TicketCategoryView(), ephemeral=True)

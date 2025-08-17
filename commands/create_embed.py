@@ -22,7 +22,8 @@ class Embed(commands.Cog):
     )
     @app_commands.allowed_contexts(guilds=True, dms=True, private_channels=True)
     @app_commands.user_install()
-    @app_commands.allowed_installs(guilds=False, users=True)
+    @app_commands.allowed_installs(guilds=True, users=True)
+    @app_commands.checks.cooldown(1, 5.0)
     async def create_embed(
         self, 
         interaction: discord.Interaction,
@@ -65,6 +66,11 @@ class Embed(commands.Cog):
             else:
                 embed.set_footer(text=footer)
         await interaction.response.send_message(embed=embed)
+
+    @create_embed.error
+    async def on_create_embed_error(self, interaction: discord.Interaction, error: app_commands.AppCommandError):
+        if isinstance(error, app_commands.CommandOnCooldown):
+            await interaction.response.send_message(str(error))
 
 async def setup(bot: commands.Bot):
     await bot.add_cog(Embed(bot))

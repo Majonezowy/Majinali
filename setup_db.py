@@ -19,6 +19,19 @@ def setup_database():
         CREATE INDEX IF NOT EXISTS idx_reaction_roles_lookup
         ON reaction_roles (guild_id, message_id, emoji);
     """)
+
+    c.execute("""
+        CREATE TABLE IF NOT EXISTS linked_text_channels (
+            channel_id_a INTEGER NOT NULL,
+            channel_id_b INTEGER NOT NULL,
+            UNIQUE(channel_id_a, channel_id_b)
+        )
+    """)
+
+    c.execute("""
+        CREATE INDEX IF NOT EXISTS idx_linked_text_channels_lookup
+        ON linked_text_channels (channel_id_a, channel_id_b);
+    """)
     
     conn.commit()
     conn.close()

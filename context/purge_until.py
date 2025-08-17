@@ -26,6 +26,7 @@ class PurgeUntil(commands.Cog):
         self.bot.tree.add_command(self.ctx_menu)
 
     @app_commands.checks.has_permissions(manage_messages=True)
+    @app_commands.allowed_contexts(guilds=True, dms=False, private_channels=True)
     async def purger(self, interaction: discord.Interaction, message: discord.Message):
         channel = message.channel
         TARGET_ID = message.id
@@ -50,7 +51,7 @@ class PurgeUntil(commands.Cog):
                 break
 
             if any(msg.id <= TARGET_ID for msg in messages):
-                messages_to_delete = [msg for msg in messages if msg.id > TARGET_ID]
+                messages_to_delete = [msg for msg in messages if msg.id >= TARGET_ID]
             else:
                 messages_to_delete = messages
 

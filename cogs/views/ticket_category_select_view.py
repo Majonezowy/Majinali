@@ -1,5 +1,5 @@
 import discord
-from modals.test import Test
+from cogs.modals.test import Test
 
 class TicketCategorySelect(discord.ui.Select):
     def __init__(self):

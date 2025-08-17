@@ -5,8 +5,8 @@ import discord
 from discord import app_commands
 from discord.ext import commands
 
-from setup_db import setup_database
-from logger_config import logger
+from bot.setup_db import setup_database
+from bot.logger_config import logger
 
 load_dotenv()
 TOKEN = os.getenv("DISCORD_TOKEN")
@@ -18,20 +18,27 @@ bot = commands.Bot(command_prefix=".", intents=intents)
 
 @bot.event
 async def setup_hook():
-    for filename in os.listdir("./commands"):
+    BASE_DIR = os.path.dirname(os.path.abspath(__file__))  # bot/
+    PROJECT_ROOT = os.path.dirname(BASE_DIR)               # Majinali/
+    COMMANDS_DIR = os.path.join(PROJECT_ROOT, "cogs", "commands")
+    print(COMMANDS_DIR)
+    EVENTS_DIR = os.path.join(PROJECT_ROOT, "cogs", "events")
+    CONTEXT_DIR = os.path.join(PROJECT_ROOT, "cogs", "context")
+
+    for filename in os.listdir(COMMANDS_DIR):
         if filename.endswith(".py") and not filename.startswith("__"):
             logger.info(f"Loading command: {filename[:-3]}")
-            await bot.load_extension(f"commands.{filename[:-3]}")
-    
-    for filename in os.listdir("./events"):
+            await bot.load_extension(f"cogs.commands.{filename[:-3]}")
+
+    for filename in os.listdir(EVENTS_DIR):
         if filename.endswith(".py") and not filename.startswith("__"):
             logger.info(f"Loading event: {filename[:-3]}")
-            await bot.load_extension(f"events.{filename[:-3]}")
-    
-    for filename in os.listdir("./context"):
+            await bot.load_extension(f"cogs.events.{filename[:-3]}")
+
+    for filename in os.listdir(CONTEXT_DIR):
         if filename.endswith(".py") and not filename.startswith("__"):
             logger.info(f"Loading context: {filename[:-3]}")
-            await bot.load_extension(f"context.{filename[:-3]}")
+            await bot.load_extension(f"cogs.context.{filename[:-3]}")
 
     logger.info("All cogs loaded successfully.\033[0m")
 
@@ -42,6 +49,6 @@ async def on_ready():
     logger.info(f"Bot logged in as {bot.user} (ID: {bot.user.id})")
 
 if __name__ == "__main__":
-    setup_database()
+    #setup_database()
     logger.info("Database setup complete.")
     bot.run(TOKEN)

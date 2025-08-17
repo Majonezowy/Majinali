@@ -2,7 +2,7 @@ import discord
 from discord import app_commands
 from discord.ext import commands
 
-from views.gif_selector_view import GifView
+from cogs.views.gif_selector_view import GifView
 
 # Replace with the user ID you want to allow
 ALLOWED_USER_ID = 123456789012345678  

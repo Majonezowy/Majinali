@@ -1,5 +1,5 @@
 import discord
-from views.ticket_category_select_view import TicketCategoryView
+from cogs.views.ticket_category_select_view import TicketCategoryView
 
 class HelpView(discord.ui.View):
     def __init__(self):

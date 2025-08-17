@@ -7,3 +7,4 @@ list events
 *.old
 *.db
 bot_data.db
+old

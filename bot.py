@@ -7,6 +7,9 @@ from discord.ext import commands
 from utils.db.db import DatabaseClient
 from utils.db.setup_db import setup_database
 from utils.logger_config import logger
+from utils.music import MusicManager
+
+from collections import deque
 
 load_dotenv()
 TOKEN = os.getenv("DISCORD_TOKEN")
@@ -17,6 +20,8 @@ class Bot(commands.Bot):
     def __init__(self):
         super().__init__(command_prefix=".", intents=discord.Intents.all())
         self.db = DatabaseClient()
+        self.queue: dict[int, deque] = {}
+        self.musicManager = MusicManager(self)
 
     async def setup_hook(self):
         BASE_DIR = os.path.dirname(os.path.abspath(__file__))  # bot/
@@ -44,6 +49,9 @@ class Bot(commands.Bot):
         assert self.user is not None, "Bot user is not set."
         await self.tree.sync()
         logger.info(f"Bot logged in as {self.user} (ID: {self.user.id})")
+
+    async def close(self):        
+        await super().close()
 
 if __name__ == "__main__":
     bot = Bot()

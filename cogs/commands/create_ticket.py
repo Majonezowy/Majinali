@@ -22,5 +22,10 @@ class Ticket(commands.Cog):
         view = HelpView()
         await interaction.response.send_message(embed=embed, view=view)
 
+    @stworz_ticket.error
+    async def stworz_ticket_on_error(self, interaction: discord.Interaction, error: app_commands.AppCommandError):
+        if isinstance(error, app_commands.errors.MissingPermissions):
+            await interaction.response.send_message(str(error), ephemeral=True)
+
 async def setup(bot: commands.Bot):
     await bot.add_cog(Ticket(bot))

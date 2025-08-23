@@ -34,14 +34,15 @@ class Embed(commands.Cog):
         author_icon: Optional[str] = "",
         footer: Optional[str] = "",
         footer_icon: Optional[str] = "",
-        color: Optional[str] = "#ffffff",
+        color: Optional[str] = None,
         url: Optional[str] = ""
     ):
-        try:
-            color = discord.Colour(int(color.lstrip('#'), 16)) # type: ignore
-        except ValueError:
-            await interaction.response.send_message("Invalid color format. Please use HEX format (e.g., #ff0000).", ephemeral=True)
-            return
+        if color:
+            try:
+                color = discord.Colour(int(color.lstrip('#'), 16)) # type: ignore
+            except ValueError:
+                await interaction.response.send_message("Invalid color format. Please use HEX format (e.g., #ff0000).", ephemeral=True)
+                return
         
         if url:
             if not is_valid_url(url):

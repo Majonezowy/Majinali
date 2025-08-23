@@ -1,18 +1,26 @@
-import discord
+from discord import ui, app_commands, Interaction
 from discord.ext import commands
-from discord import app_commands
-from utils.db.db import DatabaseClient
+import discord
+
+class SettingsView(ui.LayoutView):
+    def __init__(self):
+        super().__init__()
+
+        # Just add the TextDisplay and Separator directly
+        self.add_item(ui.TextDisplay('# Settings\n-# Example settings view'))
+        self.add_item(ui.Separator(spacing=discord.SeparatorSpacing.large))
+        self.add_item(ui.Container(ui.TextDisplay("Test i chuj")))
 
 class TestDb(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
-        self.db: DatabaseClient = bot.db
 
-    @app_commands.command(name="test_db", description="Testuje połączenie do bazy danych")
-    @app_commands.allowed_contexts(guilds=True, dms=True, private_channels=True)
-    async def test_db(self, interaction: discord.Interaction):
-        result = await self.db.fetchone("SELECT name FROM sqlite_master WHERE type='table';")
-        await interaction.response.send_message(str(result))
-    
+    @app_commands.command(name="test_db", description="Test Components v2 example")
+    async def test_db(self, interaction: Interaction):
+        view = SettingsView()
+        await interaction.response.send_message(
+            view=view
+        )
+
 async def setup(bot):
     await bot.add_cog(TestDb(bot))

@@ -41,7 +41,7 @@ class ColorFormatter(logging.Formatter):
 
         message_colored = f"{COLORS['MESSAGE']}{msg_plain}{RESET}"
 
-        return f"{time_colored}  {level_colored}  {filename_colored}  {message_colored}"
+        return f"{time_colored} {level_colored}  {filename_colored}  {message_colored}"
 
 logger = logging.getLogger("my_app")
 logger.setLevel(logging.DEBUG)

@@ -61,17 +61,19 @@ class Bot(commands.Bot):
     async def __load_cogs(self, base_dir="cogs"):
         for root, _, files in os.walk(base_dir):
             for file in files:
-                if file.endswith(".py") and not file.startswith("__"):
-                    full_path = os.path.join(root, file)
+                if not file.endswith(".py") or file.startswith("__"):
+                    continue
+                
+                full_path = os.path.join(root, file)
 
-                    module = os.path.relpath(full_path, start=".")
-                    module = module.replace(os.sep, ".").removesuffix(".py")
+                module = os.path.relpath(full_path, start=".")
+                module = module.replace(os.sep, ".").removesuffix(".py")
 
-                    logger.info(f"Loading cog: {module}")
-                    try:
-                        await bot.load_extension(module)
-                    except Exception as e:
-                        logger.error(f"❌ Failed to load {module}: {e}")
+                logger.info(f"Loading cog: {module}")
+                try:
+                    await bot.load_extension(module)
+                except Exception as e:
+                    logger.error(f"❌ Failed to load {module}: {e}")
 
     async def on_ready(self):
         assert self.user is not None, "Bot user is not set."
@@ -84,4 +86,5 @@ class Bot(commands.Bot):
 if __name__ == "__main__":
     bot = Bot()
     logger.info("Starting bot...")
+    print(discord.__version__)
     bot.run(TOKEN)

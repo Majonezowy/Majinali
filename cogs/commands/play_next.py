@@ -29,12 +29,12 @@ class SkipMusic(commands.Cog):
         if not vc:
             return await interaction.followup.send("❌ Bot nie jest połączony z kanałem głosowym.")
 
-        if vc.is_playing():
-            vc.stop()
+        if vc.is_playing(): # type: ignore
+            vc.stop() # type: ignore
 
         await self.musicManager.play_next(vc, guild.id)
 
-        queue = self.bot.queue.get(guild.id)
+        queue = self.bot.queue.get(guild.id) # type: ignore
         if queue and len(queue) > 0:
             await interaction.followup.send("⏭️ Pominięto utwór. Gram następny w kolejce 🎶")
         else:

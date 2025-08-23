@@ -5,14 +5,39 @@ import yt_dlp
 from collections import deque
 from typing import Optional, Any
 from utils.music import MusicManager
+import asyncio
 
 FFMPEG_PATH = "ffmpeg.exe"
 
 ffmpeg_opts = {
-    'before_options': '-re -reconnect 1 -reconnect_streamed 1 -reconnect_delay_max 5',
+    'before_options': '-reconnect 1 -reconnect_streamed 1 -reconnect_delay_max 5 -reconnect_at_eof 1',
     'options': '-vn'
 }
 
+async def fetch_info(query: str, ydl_opts: dict[str, Any]) -> Optional[dict[str, Any]]:
+    """
+    Pobiera informacje o utworze z YouTube w osobnym wątku, aby nie blokować event loop.
+    """
+    loop = asyncio.get_running_loop()
+    
+    def blocking_call():
+        with yt_dlp.YoutubeDL(ydl_opts) as ydl:
+            info: Optional[dict[str, Any]] = ydl.extract_info(query, download=False)
+            if not info:
+                return None
+
+            if "entries" in info and isinstance(info["entries"], list) and len(info["entries"]) > 0:
+                info = info["entries"][0]
+
+            audio_formats = [f for f in info.get("formats", []) if f.get("acodec") != "none"] # type: ignore
+            if not audio_formats:
+                return None
+
+            stream_url = audio_formats[-1]["url"]
+            title = info.get("title", "Unknown") # type: ignore
+            return {"url": stream_url, "title": title, "id": info.get("id")} # type: ignore
+    
+    return await loop.run_in_executor(None, blocking_call)
 class PlayMusic(commands.Cog):
     def __init__(self, bot: commands.Bot):
         self.bot = bot
@@ -33,46 +58,32 @@ class PlayMusic(commands.Cog):
         await interaction.response.defer()
 
         ydl_opts = {
-            "format": "bestaudio[abr<=64]",  # audio o bitrate maks. 64 kbps
+            "format": "bestaudio/best",
             "noplaylist": True
         }
+
         if not query.startswith("http"):
             ydl_opts.update({'default_search': 'ytsearch'})
 
-        try:
-            with yt_dlp.YoutubeDL(ydl_opts) as ydl:
-                info: Optional[dict[str, Any]] = ydl.extract_info(query, download=False)
-                if not info:
-                    return await interaction.followup.send("❌ Nie znalazłem niczego pasującego do zapytania.")
-                
-                if "entries" in info and isinstance(info["entries"], list) and len(info["entries"]) > 0:
-                    info = info["entries"][0]
+        result = await fetch_info(query, ydl_opts)
+        if result is None:
+            return await interaction.followup.send("❌ Nie udało się pobrać audio.")
 
-                # wybierz najlepszy format audio
-                audio_formats = [f for f in info.get("formats", []) if f.get("acodec") != "none"]
-                if not audio_formats:
-                    return await interaction.followup.send("❌ Nie udało się znaleźć formatu audio.")
-
-                # najlepszy audio stream
-                stream_url = audio_formats[-1]["url"]
-                title = info.get("title", "Unknown")
-
-                if not stream_url:
-                    return await interaction.followup.send("❌ Nie udało się uzyskać URL streamu.")
-        except Exception as e:
-            return await interaction.followup.send(f"❌ Błąd pobierania: {e}")
+        stream_url = result["url"]
+        title = result["title"]
+        yt_link = f"https://www.youtube.com/watch?v={result['id']}"
 
         vc = guild.voice_client
         if not vc:
             vc = await member.voice.channel.connect()
         else:
-            await vc.move_to(member.voice.channel)
+            await vc.move_to(member.voice.channel) # type: ignore
 
         self.musicManager.add_to_queue(guild.id, stream_url)
 
-        if not vc.is_playing():
-            await self.musicManager.play_next(vc, guild.id)
-            yt_link = f"https://www.youtube.com/watch?v={info.get('id')}"
+        if not vc.is_playing(): # type: ignore
+            await self.musicManager.play_next(vc, guild.id) # type: ignore
+            yt_link = f"https://www.youtube.com/watch?v={result['id']}"
             await interaction.followup.send(f"▶️ Gram teraz: [**{title}**]({yt_link})")
         else:
             await interaction.followup.send(f"➕ Dodano do kolejki: **{title}**")

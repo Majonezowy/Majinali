@@ -17,7 +17,7 @@ class ShowQueue(commands.Cog):
         if guild is None:
             return
 
-        queue = self.bot.queue.get(guild.id)
+        queue = self.bot.queue.get(guild.id) # type: ignore
         await interaction.response.send_message(str(queue))
 
 

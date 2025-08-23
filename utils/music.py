@@ -20,9 +20,16 @@ class MusicManager:
     async def play_next(self, vc: discord.VoiceClient, guild_id: int):
         next_song = self.get_next_from_queue(guild_id)
         if next_song:
+            source = discord.FFmpegPCMAudio(source=next_song, before_options="-reconnect 1 -reconnect_streamed 1 -reconnect_delay_max 5",options="-vn")
             vc.play(
-                discord.FFmpegPCMAudio(next_song),
+                source,
                 after=lambda e: self.bot.loop.create_task(self.play_next(vc, guild_id))
             )
         else:
             await vc.disconnect()
+
+    def stop(self, vc: discord.VoiceClient, guild_id: int):
+        if guild_id in self.queue:
+            self.queue[guild_id].clear()
+        if vc.is_playing():
+            vc.stop()

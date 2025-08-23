@@ -3,6 +3,7 @@ from discord.ext import commands
 from discord import app_commands
 import asyncio
 from utils.music import MusicManager
+from utils.fetch_metadata import fetch_metadata
 
 class SkipMusic(commands.Cog):
     def __init__(self, bot: commands.Bot):
@@ -45,6 +46,10 @@ class SkipMusic(commands.Cog):
             
             if queue and len(queue) > 0:
                 next_title = queue[0]
+                if next_title.startswith("http"):
+                    metadata = await fetch_metadata(next_title)
+                    title = metadata['title']
+                    next_title = title
                 await interaction.followup.send(f"⏭️ Pominięto utwór. Następny w kolejce: **{next_title}** 🎶")
             else:
                 await interaction.followup.send("⏭️ Pominięto utwór. Kolejka jest pusta ❌")

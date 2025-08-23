@@ -2,7 +2,30 @@ import discord
 from discord import app_commands
 from discord.ext import commands
 import asyncio
-from typing import Optional
+from typing import Optional, Any
+
+def s_getattr( obj, attr, default = None ) -> Optional[Any]:
+    return getattr(obj, attr, default)
+
+def channelInfo(channel):
+    return {
+        "id": s_getattr(channel, "id"),
+        "name": s_getattr(channel, "name"),
+        "type": str(type(channel)),
+        "category_id": s_getattr(channel, "category_id"),
+        "position": s_getattr(channel, "position"),
+        "nsfw": s_getattr(channel, "nsfw"),
+        "guild": s_getattr(getattr(channel, "guild"), "id")
+    }
+
+def authorInfo(author):
+    return {
+        "id": author.id,
+        "name": author.name,
+        "nick": s_getattr(author, "nick"),
+        "bot": author.bot,
+        "guild": s_getattr(getattr(author, "guild"), "id")
+    }
 
 class MessageData(commands.Cog):
     def __init__(self, bot: commands.Bot):
@@ -23,6 +46,7 @@ class MessageData(commands.Cog):
             guild=True,
             user=True
         )
+
         self.bot.tree.add_command(self.ctx_menu)
 
     @app_commands.checks.has_permissions(manage_messages=True)
@@ -31,42 +55,25 @@ class MessageData(commands.Cog):
         await interaction.response.defer(ephemeral=True)
 
         info = {
-            "id": message.id,
-            "channel": {
-                "id": getattr(message.channel, "id", None),
-                "name": getattr(message.channel, "name", None),
-                "type": str(type(message.channel)),
-                "category_id": getattr(message.channel, "category_id", None),
-                "position": getattr(message.channel, "position", None),
-                "nsfw": getattr(message.channel, "nsfw", None),
-                "guild": getattr(getattr(message.channel, "guild", None), "id", None)
-            },
-            "type": message.type.name,
-            "author": {
-                "id": message.author.id,
-                "name": message.author.name,
-                "nick": getattr(message.author, "nick", None),
-                "bot": message.author.bot,
-                "guild": getattr(getattr(message.author, "guild", None), "id", None)
-            },
-            "content": message.content,
-            "embeds": [embed.to_dict() for embed in message.embeds],
-            "attachments": [attachment.url for attachment in message.attachments],
-            "stickers": [sticker.name for sticker in message.stickers],
-            "flags": int(message.flags.value) if message.flags else None,
-            "pinned": message.pinned,
-            "mention_everyone": message.mention_everyone,
-            "mentions": [user.id for user in message.mentions],
-            "mention_roles": [role.id for role in message.role_mentions],
-            "created_at": str(message.created_at),
-            "edited_at": str(message.edited_at) if message.edited_at else None,
-            "referenced_message": str(message.reference) if message.reference else None,
-            "components": [component.to_dict() for component in message.components],
-            "reactions": [
-                {"emoji": str(reaction.emoji), "count": reaction.count, "me": reaction.me} 
-                for reaction in message.reactions
-            ],
-            "webhook_id": getattr(message, "webhook_id", None)
+            "channel":     channelInfo(message.channel),
+            "author":       authorInfo(message.author),
+            "id":                      message.id,
+            "pinned":                  message.pinned,
+            "type":                    message.type.name,
+            "content":                 message.content,
+            "mention_everyone":        message.mention_everyone,
+            "created_at":          str(message.created_at),
+            "edited_at":           str(message.edited_at) if message.edited_at else None,
+            "referenced_message":  str(message.reference) if message.reference else None,
+            "flags":               int(message.flags.value) if message.flags else 0,
+            "webhook_id":    s_getattr(message, "webhook_id"),
+            "mentions":      [ user.id for user in message.mentions ],
+            "mention_roles": [ role.id for role in message.role_mentions ],
+            "embeds":        [ embed.to_dict() for embed in message.embeds ],
+            "stickers":      [ sticker.name for sticker in message.stickers ],
+            "attachments":   [ attachment.url for attachment in message.attachments ],
+            "components":    [ component.to_dict() for component in message.components ],
+            "reactions":     [ { "emoji": str(r.emoji), "count": r.count, "me": r.me } for r in message.reactions ]
         }
 
         await interaction.followup.send(f"```json\n{info}\n```")

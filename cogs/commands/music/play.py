@@ -6,6 +6,7 @@ from collections import deque
 from typing import Optional, Any
 from utils.music import MusicManager
 import asyncio
+from utils.fetch_metadata import fetch_metadata
 
 class PlayMusic(commands.Cog):
     def __init__(self, bot: commands.Bot):
@@ -38,6 +39,10 @@ class PlayMusic(commands.Cog):
         self.musicManager.add_to_queue(guild.id, query)
         asyncio.create_task(self.musicManager.play_next(vc, guild.id)) # type: ignore
         queue_len = len(self.musicManager.queue.get(guild.id, []))
+        
+        if query.startswith("http"):
+            metadata = await fetch_metadata(query)
+            query = metadata['title'] # type: ignore
         
         if not vc.is_playing() and queue_len == 1: # type: ignore
             await interaction.followup.send(f"▶️ Gram teraz: **{query}**")

@@ -20,8 +20,7 @@ class SetVolume(commands.Cog):
         else:
             self.musicManager.set_volume(value)
 
-        await interaction.response.send_message(f"🔊 Ustawiono głośność na {value}%", ephemeral=True)
-
+        await interaction.response.send_message(f"🔊 Ustawiono głośność na {value}%")
 
 async def setup(bot: commands.Bot):
     await bot.add_cog(SetVolume(bot))

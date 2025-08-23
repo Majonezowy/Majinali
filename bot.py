@@ -23,6 +23,8 @@ class Bot(commands.Bot):
         self.queue: dict[int, deque] = {}
         self.musicManager = MusicManager(self)
 
+        self.own_channels: dict[discord.Member, int] = {}
+
     async def setup_hook(self):
         BASE_DIR = os.path.dirname(os.path.abspath(__file__))  # bot/
         COGS_DIR = os.path.join(BASE_DIR, "cogs")

@@ -1,0 +1,8 @@
+{
+    "music": {
+        "added_to_queue": "**#{index} Utwór został dodany do kolejki - {duration}**",
+        "added_to_queue_title": "{title} został dodany",
+        "playing_now": "**## Gram teraz**",
+        "playing_now_title": "{title} - {duration}"
+    }
+}

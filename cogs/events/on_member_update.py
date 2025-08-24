@@ -9,13 +9,10 @@ class BotNicknameChange(commands.Cog):
     async def on_member_update(self, before: discord.Member, after: discord.Member):
         if after.id == self.bot.user.id:
             return
-        
-        before.name
 
-        if before.nick != after.nick:
-            old_nick = before.nick
+        if before.nick != after.nick and after.nick is not None:
             try:
-                await after.edit(nick=old_nick)
+                await after.edit(nick=None)
             except discord.Forbidden:
                 return
             except discord.HTTPException:

@@ -1,12 +1,8 @@
 import discord
 from discord.ext import commands
 from discord import app_commands
-import yt_dlp
-from collections import deque
-from typing import Optional, Any
 from utils.music import MusicManager
 import asyncio
-from utils.fetch_metadata import fetch_metadata
 
 from cogs.views.music.added_to_queue import AddedQueueView
 from cogs.views.music.playing_now import PlayingNowView
@@ -19,10 +15,11 @@ class PlayMusic(commands.Cog):
 
     @app_commands.command(name="play", description="Odtwórz muzykę z linku (YouTube/SoundCloud)")
     @app_commands.describe(query="Nazwa lub URL piosenki")
+    @app_commands.checks.cooldown(rate=1, per=6.75)
     async def play_music(self, interaction: discord.Interaction, query: str):
         guild = interaction.guild
         member = interaction.user
-        locale = interaction.locale
+        locale = str(interaction.locale).split("-")[0]
         
         if guild is None:
             return
@@ -30,7 +27,9 @@ class PlayMusic(commands.Cog):
         member = guild.get_member(member.id)
         
         if not member or not member.voice or not member.voice.channel:
-            return await interaction.response.send_message("❌ Musisz być w kanale głosowym!", ephemeral=True)
+            return await interaction.response.send_message(
+                self.langManager.t(locale, "music.not_in_voice"), ephemeral=True
+            )
 
         await interaction.response.defer()
 
@@ -41,16 +40,16 @@ class PlayMusic(commands.Cog):
         else:
             await vc.move_to(member.voice.channel) # type: ignore
 
-        self.musicManager.add_to_queue(guild.id, query)
-        asyncio.create_task(self.musicManager.play_next(vc, guild.id)) # type: ignore
-        queue_len = len(self.musicManager.queue.get(guild.id, []))
-        
         if not query.startswith("http"):
             query_info = self.musicManager.fetch_video_url(query)
             if query_info:
                 query = query_info
             else:
-                await interaction.followup.send("Nie znalazlem niczego co pasuje do zapytania")
+                await interaction.followup.send("Nie znalazlem niczego co pasuje do zapytania", ephemeral=True)
+        
+        self.musicManager.add_to_queue(guild.id, query)
+        asyncio.create_task(self.musicManager.play_next(vc, guild.id)) # type: ignore
+        queue_len = len(self.musicManager.queue.get(guild.id, []))
             
         metadata = await self.musicManager.fetch_metadata(query)
         query = metadata['title'] # type: ignore
@@ -62,7 +61,7 @@ class PlayMusic(commands.Cog):
                 img=img, # type: ignore
                 title=query,
                 duration=duration, # type: ignore
-                local_lang=str(locale).split("-")[0],
+                local_lang=locale,
                 langmanager=self.langManager
             )
             await interaction.followup.send(view=view)
@@ -72,7 +71,7 @@ class PlayMusic(commands.Cog):
                 index=queue_len,
                 title=query,
                 duration=duration, # type: ignore
-                local_lang=str(locale).split("-")[0],
+                local_lang=locale,
                 langmanager=self.langManager
             )
             await interaction.followup.send(view=view)
@@ -81,6 +80,11 @@ class PlayMusic(commands.Cog):
     async def play_music_error(self, interaction: discord.Interaction, error: app_commands.AppCommandError):
         if isinstance(error, discord.errors.ConnectionClosed):
             return
+        elif isinstance(error, app_commands.CommandOnCooldown):
+            if interaction.response.is_done():
+                await interaction.followup.send(str(error), ephemeral=True)
+            else:
+                await interaction.response.send_message(str(error), ephemeral=True)
         else:
             await interaction.followup.send(str(error))
 

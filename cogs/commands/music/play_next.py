@@ -2,17 +2,22 @@ import discord
 from discord.ext import commands
 from discord import app_commands
 import asyncio
+
 from utils.music import MusicManager
+from utils.lang_manager import LangManager
+from utils import logger
 
 class SkipMusic(commands.Cog):
     def __init__(self, bot: commands.Bot):
         self.bot = bot
         self.musicManager: MusicManager = self.bot.musicManager # type: ignore
+        self.langManager: LangManager = self.bot.lang_manager # type: ignore
 
     @app_commands.command(name="skip", description="Pomija obecną piosenkę")
     async def skip(self, interaction: discord.Interaction):
         guild = interaction.guild
         member = interaction.user
+        locale = str(interaction.locale).split("-")[0]
         
         if guild is None:
             return
@@ -21,40 +26,43 @@ class SkipMusic(commands.Cog):
         
         if not member or not member.voice or not member.voice.channel:
             return await interaction.response.send_message(
-                "❌ Musisz być w kanale głosowym!", ephemeral=True
+                self.langManager.t(locale, "music.not_in_voice"), ephemeral=True
             )
 
         vc: discord.VoiceClient = guild.voice_client # type: ignore
         
         if not vc:
             return await interaction.response.send_message(
-                "❌ Bot nie jest połączony z kanałem głosowym.", ephemeral=True
+                self.langManager.t(locale, "music.bot_not_in_voice"), ephemeral=True
             )
 
         await interaction.response.defer()
         asyncio.create_task(self._skip_logic(vc, guild.id, interaction))
 
     async def _skip_logic(self, vc: discord.VoiceClient, guild_id: int, interaction: discord.Interaction):
-        try:
-            await self.musicManager.skip_current(vc, guild_id)
+        await self.musicManager.skip_current(vc, guild_id)
+        locale = str(interaction.locale).split("-")[0]
+        
+        await asyncio.sleep(0.1)
 
-            await asyncio.sleep(0.1)
-
-            queue = self.musicManager.queue.get(guild_id, [])
-            next_title = None
+        queue = self.musicManager.queue.get(guild_id, [])
+        next_title = None
+        
+        if queue and len(queue) > 0:
+            next_title = queue[0]
+            if next_title.startswith("http"):
+                metadata = await self.musicManager.fetch_metadata(next_title)
+            title = metadata['title']
+            next_title = title
             
-            if queue and len(queue) > 0:
-                next_title = queue[0]
-                if next_title.startswith("http"):
-                    metadata = await self.musicManager.fetch_metadata(next_title)
-                    title = metadata['title']
-                    next_title = title
-                await interaction.followup.send(f"⏭️ Pominięto utwór. Następny w kolejce: **{next_title}** 🎶")
-            else:
-                await interaction.followup.send("⏭️ Pominięto utwór. Kolejka jest pusta ❌")
-                await vc.disconnect()
-        except Exception as e:
-            await interaction.followup.send(f"❌ Wystąpił błąd przy pomijaniu utworu: {e}")
+            await interaction.followup.send(self.langManager.t(locale, "music.track_skipped", next_title=next_title))
+        else:
+            await interaction.followup.send(self.langManager.t(locale, "music.track_skipped_end"))
+            await vc.disconnect()
+            
+    @skip.error
+    async def on_skip_error(self, interaction: discord.Interaction, error: app_commands.AppCommandError):
+        await logger.handle_error(interaction, error, self.langManager)
 
 
 async def setup(bot: commands.Bot):

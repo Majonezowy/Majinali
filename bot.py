@@ -7,7 +7,7 @@ from discord.ext import commands
 from utils.db.db import DatabaseClient
 from utils.db.setup_db import setup_database
 
-from utils.logger_config import logger
+from utils.logger import logger
 
 # Muzyka
 from utils.music import MusicManager
@@ -86,5 +86,4 @@ class Bot(commands.Bot):
 if __name__ == "__main__":
     bot = Bot()
     logger.info("Starting bot...")
-    print(discord.__version__)
     bot.run(TOKEN)

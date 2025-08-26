@@ -1,4 +1,8 @@
 import logging
+import discord
+from discord import app_commands
+
+from utils.lang_manager import LangManager
 
 try:
     import colorama
@@ -51,3 +55,16 @@ console_handler.setLevel(logging.DEBUG)
 console_handler.setFormatter(ColorFormatter(datefmt="%Y-%m-%d %H:%M:%S", time_color_id=246))
 
 logger.addHandler(console_handler)
+
+async def handle_error(interaction: discord.Interaction, error: app_commands.AppCommandError, lang_manager: LangManager):
+    member = interaction.user
+    locale = str(interaction.locale).split("-")[0]
+    
+    if not lang_manager:
+        logger.error("No langmanager")
+        return
+    
+    if member.id == 693544583891517600:
+        await interaction.followup.send(str(error))
+    
+    await interaction.followup.send(lang_manager.t(locale, "error"))

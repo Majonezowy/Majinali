@@ -1,8 +1,14 @@
 {
+    "error": "Wystąpił niespodziewany błąd.",
+
     "music": {
         "added_to_queue": "**#{index} Utwór został dodany do kolejki - {duration}**",
         "added_to_queue_title": "{title} został dodany",
         "playing_now": "**## Gram teraz**",
-        "playing_now_title": "{title} - {duration}"
+        "playing_now_title": "{title} - {duration}",
+        "not_in_voice": "❌ Musisz być w kanale głosowym!",
+        "bot_not_in_voice": "❌ Bot nie jest połączony z kanałem głosowym.",
+        "track_skipped": "⏭️ Pominięto utwór. Następny w kolejce: **{next_title}** 🎶",
+        "track_skipped_end": "⏭️ Pominięto utwór. Kolejka jest pusta."
     }
 }

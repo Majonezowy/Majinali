@@ -103,8 +103,10 @@ class MusicManager:
                 if guild_id in self.queue and self.queue[guild_id]:
                     self.queue[guild_id].popleft()
                 asyncio.run_coroutine_threadsafe(self.play_next(vc, guild_id), self.bot.loop)
-
-            vc.play(volume_source, after=after_playing)
+            try:
+                vc.play(volume_source, after=after_playing)
+            except discord.errors.ClientException:
+                return
             return info["title"]
 
     def stop(self, vc: discord.VoiceClient, guild_id: int):

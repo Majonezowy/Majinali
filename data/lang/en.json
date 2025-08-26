@@ -1,8 +1,14 @@
 {
+    "error": "Unexpected error has occurred.",
+
     "music": {
         "added_to_queue": "**#{index} Track added to queue - {duration}**",
         "added_to_queue_title": "{title} has been added",
         "playing_now": "**## Playing now**",
-        "playing_now_title": "{title} - {duration}"
+        "playing_now_title": "{title} - {duration}",
+        "not_in_voice": "❌ You have to be connected to voice channel!",
+        "bot_not_in_voice": "❌ Bot is not connected to voice channel.",
+        "track_skipped": "⏭️ Track skipped. Next in queue: **{next_title}** 🎶",
+        "track_skipped_end": "⏭️ Track skipped. Queue is empty."
     }
 }

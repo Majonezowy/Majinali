@@ -9,6 +9,13 @@
         "not_in_voice": "❌ Musisz być w kanale głosowym!",
         "bot_not_in_voice": "❌ Bot nie jest połączony z kanałem głosowym.",
         "track_skipped": "⏭️ Pominięto utwór. Następny w kolejce: **{next_title}** 🎶",
-        "track_skipped_end": "⏭️ Pominięto utwór. Kolejka jest pusta."
+        "track_skipped_end": "⏭️ Pominięto utwór. Kolejka jest pusta.",
+        "volume_not_in_range": "❌ Głośność musi być zakresie 1–100.",
+        "volume_set": "🔊 Ustawiono głośność na {value}%"
+    },
+    "soundboard": {
+        "playing": "🔊 Pomyśnie odtworzono dźwięk.",
+        "invalid_url": "❌ Niepoprawny url do dźwięku!",
+        "sound_not_found": "❌ Nie znalazłem dźwięku!"
     }
 }

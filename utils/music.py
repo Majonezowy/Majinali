@@ -26,7 +26,8 @@ class MusicManager:
     def __init__(self, bot: commands.Bot) -> None:
         self.bot = bot
         self.queue: dict[int, deque] = self.bot.queue                                                                               # type: ignore
-        self.volume: float = 1.0
+        self.volume: dict[int, float] = {}
+        self.default_volume = 0.3
 
         self.playing_locks: dict[int, asyncio.Lock] = {}
         self.stopped: dict[int, bool] = {}
@@ -66,6 +67,7 @@ class MusicManager:
         if guild_id not in self.queue:
             self.queue[guild_id] = deque()
         self.queue[guild_id].append(query)
+        self.stopped[guild_id] = False
 
     def get_next_from_queue(self, guild_id: int):
         if guild_id in self.queue and self.queue[guild_id]:
@@ -77,7 +79,9 @@ class MusicManager:
             self.playing_locks[guild_id] = asyncio.Lock()
         if guild_id not in self.stopped:
             self.stopped[guild_id] = False
-
+        if guild_id not in self.volume:
+            self.volume[guild_id] = 0.3
+            
         async with self.playing_locks[guild_id]:
             if vc.is_playing() or self.stopped[guild_id]:
                 return
@@ -95,7 +99,7 @@ class MusicManager:
 
             stream_url = info["url"]
             source = discord.FFmpegPCMAudio(stream_url, **ffmpeg_opts)                                                          # type: ignore
-            volume_source = discord.PCMVolumeTransformer(source, volume=self.volume)
+            volume_source = discord.PCMVolumeTransformer(source, volume=self.volume[guild_id])
 
             def after_playing(err):
                 if self.stopped[guild_id]:
@@ -118,11 +122,11 @@ class MusicManager:
         if vc.is_playing():
             vc.stop()
 
-    def set_volume(self, volume: int, vc: Optional[discord.VoiceClient] = None):
-        if volume < 0 or volume > 100:
+    def set_volume(self, volume: int, guild_id: int, vc: Optional[discord.VoiceClient] = None):
+        if volume <= 0 or volume > 100:
             return
         
-        self.volume = volume
+        self.volume[guild_id] = volume / 100
 
         if vc and vc.is_playing() and isinstance(vc.source, discord.PCMVolumeTransformer):
             vc.source.volume = volume / 100

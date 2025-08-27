@@ -9,6 +9,13 @@
         "not_in_voice": "❌ You have to be connected to voice channel!",
         "bot_not_in_voice": "❌ Bot is not connected to voice channel.",
         "track_skipped": "⏭️ Track skipped. Next in queue: **{next_title}** 🎶",
-        "track_skipped_end": "⏭️ Track skipped. Queue is empty."
+        "track_skipped_end": "⏭️ Track skipped. Queue is empty.",
+        "volume_not_in_range": "❌ Volume value must be in range 0–100.",
+        "volume_set": "🔊 Volume set to {value}%"
+    },
+    "soundboard": {
+        "playing": "🔊 Successfully played sound.",
+        "invalid_url": "❌ Invalid URL to sound!",
+        "sound_not_found": "❌ I couldn't find this sound!"
     }
 }

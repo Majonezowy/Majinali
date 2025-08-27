@@ -64,6 +64,5 @@ class SkipMusic(commands.Cog):
     async def on_skip_error(self, interaction: discord.Interaction, error: app_commands.AppCommandError):
         await logger.handle_error(interaction, error, self.langManager)
 
-
 async def setup(bot: commands.Bot):
     await bot.add_cog(SkipMusic(bot))

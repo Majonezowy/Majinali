@@ -16,7 +16,7 @@ class CheckLocate(commands.Cog):
         if key and lang:
             v = self.langManager.t(lang, key)
             
-        await interaction.response.send_message(f"{interaction.guild_locale}\n{v}")
+        await interaction.response.send_message(f"{interaction.locale}\n{v}")
         
 async def setup(bot):
     await bot.add_cog(CheckLocate(bot))

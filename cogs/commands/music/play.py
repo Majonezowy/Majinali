@@ -7,11 +7,14 @@ import asyncio
 from cogs.views.music.added_to_queue import AddedQueueView
 from cogs.views.music.playing_now import PlayingNowView
 
+from utils.lang_manager import LangManager
+from utils import logger
+
 class PlayMusic(commands.Cog):
     def __init__(self, bot: commands.Bot):
         self.bot = bot
         self.musicManager: MusicManager = self.bot.musicManager  # type: ignore
-        self.langManager = self.bot.lang_manager # type: ignore
+        self.langManager: LangManager = self.bot.lang_manager # type: ignore
 
     @app_commands.command(name="play", description="Odtwórz muzykę z linku (YouTube/SoundCloud)")
     @app_commands.describe(query="Nazwa lub URL piosenki")
@@ -52,8 +55,8 @@ class PlayMusic(commands.Cog):
         queue_len = len(self.musicManager.queue.get(guild.id, []))
             
         metadata = await self.musicManager.fetch_metadata(query)
-        query = metadata['title'] # type: ignore
-        img = metadata.get("thumbnail", interaction.user.display_avatar.url)
+        query = metadata.get('title') or query.split("/")[-1] # type: ignore
+        img = metadata.get("thumbnail") or interaction.user.display_avatar.url
         duration = metadata['duration']
         
         if not vc.is_playing() and queue_len == 1: # type: ignore
@@ -75,18 +78,10 @@ class PlayMusic(commands.Cog):
                 langmanager=self.langManager
             )
             await interaction.followup.send(view=view)
-
+    
     @play_music.error
     async def play_music_error(self, interaction: discord.Interaction, error: app_commands.AppCommandError):
-        if isinstance(error, discord.errors.ConnectionClosed):
-            return
-        elif isinstance(error, app_commands.CommandOnCooldown):
-            if interaction.response.is_done():
-                await interaction.followup.send(str(error), ephemeral=True)
-            else:
-                await interaction.response.send_message(str(error), ephemeral=True)
-        else:
-            await interaction.followup.send(str(error))
-
+        await logger.handle_error(interaction, error, self.langManager)
+        
 async def setup(bot: commands.Bot):
     await bot.add_cog(PlayMusic(bot))

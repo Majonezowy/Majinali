@@ -2,11 +2,14 @@ import discord
 from discord import ui
 
 from utils.lang_manager import LangManager
+from utils.logger import logger
 
 class PlayingNowView(discord.ui.LayoutView):
     def __init__(self, img: str, title: str, duration: str, local_lang: str, langmanager: LangManager):
         super().__init__(timeout=None)
         self.lang: LangManager = langmanager
+        
+        logger.debug(f"{title}, {duration}, {img}")
         
         thumbnail = ui.Thumbnail(media=img)
         

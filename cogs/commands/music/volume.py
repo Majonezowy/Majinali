@@ -14,6 +14,7 @@ class SetVolume(commands.Cog):
 
     @app_commands.command(name="volume", description="Ustawia głośność od 0 do 100")
     async def volume(self, interaction: discord.Interaction, value: int):
+        await interaction.response.defer()
         locale = str(interaction.locale).split("-")[0]
         
         if value <= 0 or value > 100:

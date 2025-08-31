@@ -15,6 +15,8 @@ class SkipMusic(commands.Cog):
 
     @app_commands.command(name="skip", description="Pomija obecną piosenkę")
     async def skip(self, interaction: discord.Interaction):
+        await interaction.response.defer()
+        
         guild = interaction.guild
         member = interaction.user
         locale = str(interaction.locale).split("-")[0]
@@ -36,7 +38,6 @@ class SkipMusic(commands.Cog):
                 self.langManager.t(locale, "music.bot_not_in_voice"), ephemeral=True
             )
 
-        await interaction.response.defer()
         asyncio.create_task(self._skip_logic(vc, guild.id, interaction))
 
     async def _skip_logic(self, vc: discord.VoiceClient, guild_id: int, interaction: discord.Interaction):

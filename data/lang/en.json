@@ -1,5 +1,8 @@
 {
     "error": "Unexpected error has occurred.",
+    "no_permissions": "❌ You don't have permission to use this.",
+    "command_on_cooldown": "⏰ Command is on cooldown, try again in {time}s",
+    "command_not_found": "❌ This command does not exist.",
 
     "music": {
         "added_to_queue": "**#{index} Track added to queue - {duration}**",
@@ -11,7 +14,10 @@
         "track_skipped": "⏭️ Track skipped. Next in queue: **{next_title}** 🎶",
         "track_skipped_end": "⏭️ Track skipped. Queue is empty.",
         "volume_not_in_range": "❌ Volume value must be in range 0–100.",
-        "volume_set": "🔊 Volume set to {value}%"
+        "volume_set": "🔊 Volume set to {value}%",
+        "queue_title": "## Queue",
+        "queue_empty": "Empty.",
+        "stopped": "Playback stopped."
     },
     "soundboard": {
         "playing": "🔊 Successfully played sound.",

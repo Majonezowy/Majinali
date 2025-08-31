@@ -1,10 +1,10 @@
 import os
 import json
 from collections import defaultdict
-from typing import Any
+from typing import Any, Optional
 
 class LangManager:
-    def __init__(self, base_path: str = None, default_lang: str = "en"):
+    def __init__(self, base_path: Optional[str] = None, default_lang: str = "en"):
         self.cache: dict[str, dict[str, str]] = {}
         self.default_lang = default_lang
         self.base_path = base_path or os.path.join(os.path.dirname(__file__), "..", "data", "lang")
@@ -25,7 +25,7 @@ class LangManager:
 
         for part in key.split("."):
             if isinstance(data, dict):
-                data = data.get(part)
+                data = data.get(part) # type: ignore
             else:
                 data = None
                 break

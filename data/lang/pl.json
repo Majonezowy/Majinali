@@ -1,5 +1,8 @@
 {
     "error": "Wystąpił niespodziewany błąd.",
+    "no_permissions": "❌ Nie masz uprawnień żeby tego użyć.",
+    "command_on_cooldown": "⏰ Komenda jest na cooldown'ie, spróbuj ponownie za {time}s",
+    "command_not_found": "❌ Nie znaleziono takiej komendy.",
 
     "music": {
         "added_to_queue": "**#{index} Utwór został dodany do kolejki - {duration}**",
@@ -11,7 +14,10 @@
         "track_skipped": "⏭️ Pominięto utwór. Następny w kolejce: **{next_title}** 🎶",
         "track_skipped_end": "⏭️ Pominięto utwór. Kolejka jest pusta.",
         "volume_not_in_range": "❌ Głośność musi być zakresie 1–100.",
-        "volume_set": "🔊 Ustawiono głośność na {value}%"
+        "volume_set": "🔊 Ustawiono głośność na {value}%",
+        "queue_title": "## Kolejka",
+        "queue_empty": "Pusto.",
+        "stopped": "Odtwarzanie zatrzymane."
     },
     "soundboard": {
         "playing": "🔊 Pomyśnie odtworzono dźwięk.",

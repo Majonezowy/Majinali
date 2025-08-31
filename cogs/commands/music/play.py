@@ -20,6 +20,8 @@ class PlayMusic(commands.Cog):
     @app_commands.describe(query="Nazwa lub URL piosenki")
     @app_commands.checks.cooldown(rate=1, per=6.75)
     async def play_music(self, interaction: discord.Interaction, query: str):
+        await interaction.response.defer()
+        
         guild = interaction.guild
         member = interaction.user
         locale = str(interaction.locale).split("-")[0]
@@ -33,8 +35,6 @@ class PlayMusic(commands.Cog):
             return await interaction.response.send_message(
                 self.langManager.t(locale, "music.not_in_voice"), ephemeral=True
             )
-
-        await interaction.response.defer()
 
         vc = guild.voice_client
         

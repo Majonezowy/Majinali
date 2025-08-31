@@ -1,8 +1,34 @@
 import logging
 import discord
 from discord import app_commands
+import traceback
+
+from typing import Optional
 
 from utils.lang_manager import LangManager
+from utils.config import load_config
+
+data = load_config()
+def get_level(data):
+    
+    if not data:
+        return logging.DEBUG
+    
+    logging_data = data.get("logging", None)
+    
+    if not logging_data:
+        return logging.DEBUG
+    
+    level_name = logging_data.get("level", logging.DEBUG)
+    
+    levels = {
+        "DEBUG": logging.DEBUG,
+        "INFO": logging.INFO,
+        "WARNING": logging.WARNING,
+        "ERROR": logging.ERROR,
+        "CRITICAL": logging.CRITICAL,
+    }
+    return levels.get(level_name.upper(), logging.DEBUG)
 
 try:
     import colorama
@@ -47,24 +73,41 @@ class ColorFormatter(logging.Formatter):
 
         return f"{time_colored} {level_colored}  {filename_colored}  {message_colored}"
 
-logger = logging.getLogger("my_app")
-logger.setLevel(logging.DEBUG)
+logger = logging.getLogger("Majinali")
+level = get_level(data)
+logger.setLevel(level)
 
 console_handler = logging.StreamHandler()
-console_handler.setLevel(logging.DEBUG)
+console_handler.setLevel(level)
 console_handler.setFormatter(ColorFormatter(datefmt="%Y-%m-%d %H:%M:%S", time_color_id=246))
 
 logger.addHandler(console_handler)
 
 async def handle_error(interaction: discord.Interaction, error: app_commands.AppCommandError, lang_manager: LangManager):
-    member = interaction.user
-    locale = str(interaction.locale).split("-")[0]
-    
-    if not lang_manager:
-        logger.error("No langmanager")
-        return
-    
-    if member.id == 693544583891517600:
-        await interaction.followup.send(str(error))
-    
-    await interaction.followup.send(lang_manager.t(locale, "error"))
+    try:
+        member = interaction.user
+        locale = str(interaction.locale).split("-")[0]
+        
+        if not lang_manager:
+            logger.error("No langmanager")
+            return
+        
+        if isinstance(error, app_commands.errors.CommandOnCooldown):
+            content = lang_manager.t(locale, "command_on_cooldown", time=f"{error.retry_after:.2f}")
+        elif isinstance(error, app_commands.CheckFailure):
+            content = lang_manager.t(locale, "no_permissions")
+        elif isinstance(error, app_commands.CommandNotFound):
+            content = lang_manager.t(locale, "command_not_found")
+        else:
+            content = lang_manager.t(locale, "error")
+            
+        if member.id == 693544583891517600:
+            content += f"\n{str(error)}"
+        
+        if not interaction.response.is_done():
+            await interaction.response.send_message(content, ephemeral=True)
+        else:
+            await interaction.followup.send(content, ephemeral=True)
+    except Exception as e:
+        logger.error(f"{e}\n{traceback.format_exc()}")
+        

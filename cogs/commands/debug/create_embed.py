@@ -3,6 +3,7 @@ from discord import app_commands, Colour
 from discord.ext import commands
 from typing import Optional
 import re
+from utils import logger
 
 def is_valid_url(link: str | None = None) -> bool:
     if link is None:
@@ -12,6 +13,7 @@ def is_valid_url(link: str | None = None) -> bool:
 class Embed(commands.Cog):
     def __init__(self, bot: commands.Bot):
         self.bot = bot
+        self.langManager = self.bot.lang_manager # type: ignore
 
     @app_commands.command(name="create_embed", description="Creates an embed.")
     @app_commands.describe(
@@ -69,9 +71,8 @@ class Embed(commands.Cog):
         await interaction.response.send_message(embed=embed)
 
     @create_embed.error
-    async def on_create_embed_error(self, interaction: discord.Interaction, error: app_commands.AppCommandError):
-        if isinstance(error, app_commands.CommandOnCooldown):
-            await interaction.response.send_message(str(error))
+    async def create_embed_error(self, interaction: discord.Interaction, error: app_commands.AppCommandError):
+        await logger.handle_error(interaction, error, self.langManager)
 
 async def setup(bot: commands.Bot):
     await bot.add_cog(Embed(bot))

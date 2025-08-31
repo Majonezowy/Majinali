@@ -1,11 +1,17 @@
 import os
+import sys
+import traceback
 from dotenv import load_dotenv
 
 import discord
 from discord.ext import commands
+from discord import app_commands
 
 from utils.db.db import DatabaseClient
 from utils.db.setup_db import setup_database
+
+from utils.db.nsql import nSQL
+from utils.config import load_config
 
 from utils.logger import logger
 
@@ -25,17 +31,23 @@ class Bot(commands.Bot):
     def __init__(self):
         super().__init__(command_prefix=".", intents=discord.Intents.all())
         self.db = DatabaseClient()
-
+        
+        self.config = load_config()
+        if not self.config:
+            logger.error("No config file!")
+            self.config = {}
+        
         # Muzyka
-        self.queue: dict[int, deque] = {}
+        #self.queue: dict[int, deque] = {} # guild_id -> queue object
+        self.queue = nSQL(type=self.config.get("nsql", "dict") or "dict")
         self.musicManager = MusicManager(self)
 
         # Własne kanały
-        self.own_channels: dict[discord.Member, int] = {}
+        self.own_channels: dict[int, int] = {} # user_id -> channel_id
 
         # Język
         self.lang_manager = LangManager()
-
+        
     async def setup_hook(self):
         BASE_DIR = os.path.dirname(os.path.abspath(__file__))  # bot/
         COGS_DIR = os.path.join(BASE_DIR, "cogs")
@@ -51,7 +63,7 @@ class Bot(commands.Bot):
         await self.__load_cogs(CONTEXTS_DIR)
 
         logger.info("All cogs loaded successfully.\033[0m")
-
+        
     # async def __load_cogs(self, dir, type):
     #     for filename in os.listdir(dir):
     #        if filename.endswith(".py") and not filename.startswith("__"):
@@ -71,9 +83,11 @@ class Bot(commands.Bot):
 
                 logger.info(f"Loading cog: {module}")
                 try:
-                    await bot.load_extension(module)
+                    await self.load_extension(module)
                 except Exception as e:
-                    logger.error(f"❌ Failed to load {module}: {e}")
+                    logger.error(f"❌ Failed to load {module}: {e}\n{traceback.format_exc()}")
+                except KeyboardInterrupt:
+                    sys.exit(-1)
 
     async def on_ready(self):
         assert self.user is not None, "Bot user is not set."

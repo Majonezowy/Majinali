@@ -1,0 +1,34 @@
+data = {
+    "title": "Przykład",
+    "id-1": {
+        "label": "Tekst na polem1",
+        "placeholder": "Placeholder",
+        "style": discord.TextStyle.short,
+        "required": True,
+        "min_length": 1,
+        "max_length": 4000,
+        "default": "domyslna wartosc",
+        "row": None
+    },
+    "id-2": {
+        "label": "Tekst na polem2",
+        "placeholder": "Placeholder",
+        "style": discord.TextStyle.short,
+        "required": True,
+        "min_length": 1,
+        "max_length": 4000,
+        "default": "domyslna wartosc",
+        "row": None
+    },
+    "id-3": {
+        "label": "Tekst na polem3",
+        "placeholder": "Placeholder",
+        "style": discord.TextStyle.short,
+        "required": True,
+        "min_length": 1,
+        "max_length": 4000,
+        "default": "domyslna wartosc",
+        "row": None
+    },
+    "on_submit": lambda: ...
+}

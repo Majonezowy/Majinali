@@ -1,7 +1,7 @@
 import discord
 from discord import ui
 
-from utils.lang_manager import LangManager
+from utility.lang_manager import LangManager
 
 class AddedQueueView(discord.ui.LayoutView):
     def __init__(self, img: str, index: int, title: str, duration: str, local_lang: str, langmanager: LangManager):

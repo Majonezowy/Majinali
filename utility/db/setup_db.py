@@ -1,4 +1,4 @@
-from utils.db.db import DatabaseClient
+from utility.db.db import DatabaseClient
 
 async def setup_database(db: DatabaseClient):
     """Sets up the database and creates necessary tables."""

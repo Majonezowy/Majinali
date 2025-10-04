@@ -1,0 +1,3 @@
+youtube-serach potrzebuje zakomentarzowania proxies i zmiany proxies na proxy w generatorach
+
+.venv\Lib\site-packages\youtubesearchpython\core\requests.py

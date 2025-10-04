@@ -1,6 +1,6 @@
 from typing import Any
 import redis
-from utils.logger import logger
+from utility.logger import logger
 import pickle
 
 class nSQL:

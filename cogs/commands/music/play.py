@@ -1,14 +1,16 @@
 import discord
 from discord.ext import commands
 from discord import app_commands
-from utils.music import MusicManager
+from utility.music import MusicManager
 import asyncio
 
 from cogs.views.music.added_to_queue import AddedQueueView
 from cogs.views.music.playing_now import PlayingNowView
 
-from utils.lang_manager import LangManager
-from utils import logger
+from cogs.permissions.is_feature_enabled import is_feature_enabled
+
+from utility.lang_manager import LangManager
+from utility import logger
 
 class PlayMusic(commands.Cog):
     def __init__(self, bot: commands.Bot):
@@ -19,6 +21,7 @@ class PlayMusic(commands.Cog):
     @app_commands.command(name="play", description="Odtwórz muzykę z linku (YouTube/SoundCloud)")
     @app_commands.describe(query="Nazwa lub URL piosenki")
     @app_commands.checks.cooldown(rate=1, per=6.75)
+    @is_feature_enabled("music")
     async def play_music(self, interaction: discord.Interaction, query: str):
         await interaction.response.defer()
         
@@ -81,6 +84,8 @@ class PlayMusic(commands.Cog):
     
     @play_music.error
     async def play_music_error(self, interaction: discord.Interaction, error: app_commands.AppCommandError):
+        if str(error).startswith("Feature"): return
+
         await logger.handle_error(interaction, error, self.langManager)
         
 async def setup(bot: commands.Bot):

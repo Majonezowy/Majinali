@@ -1,8 +1,8 @@
 import discord
 from discord import ui
 
-from utils.lang_manager import LangManager
-from utils.logger import logger
+from utility.lang_manager import LangManager
+from utility.logger import logger
 
 class PlayingNowView(discord.ui.LayoutView):
     def __init__(self, img: str, title: str, duration: str, local_lang: str, langmanager: LangManager):

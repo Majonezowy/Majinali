@@ -6,7 +6,7 @@ class DatabaseClient:
         self.db_type = "sqlite"
         self.path = "data/bot_data.db"
         self.conn: Optional[aiosqlite.Connection] = None
-
+    
     async def connect(self):
         if self.db_type == "sqlite":
             self.conn = await aiosqlite.connect(self.path)

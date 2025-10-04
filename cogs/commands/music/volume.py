@@ -2,9 +2,9 @@ import discord
 from discord.ext import commands
 from discord import app_commands
 
-from utils.music import MusicManager
-from utils.lang_manager import LangManager
-from utils import logger
+from utility.music import MusicManager
+from utility.lang_manager import LangManager
+from utility import logger
 
 class SetVolume(commands.Cog):
     def __init__(self, bot: commands.Bot):

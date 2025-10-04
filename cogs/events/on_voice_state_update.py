@@ -17,7 +17,6 @@ class ModularVoiceChannels(commands.Cog):
             self.own_channels.pop(member)
             await vc.delete()
 
-
         if after.channel is None:
             return
 

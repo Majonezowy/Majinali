@@ -3,7 +3,7 @@ from discord import app_commands, Colour
 from discord.ext import commands
 from typing import Optional
 import re
-from utils import logger
+from utility import logger
 
 def is_valid_url(link: str | None = None) -> bool:
     if link is None:

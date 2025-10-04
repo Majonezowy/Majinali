@@ -2,8 +2,8 @@ import discord
 from discord.ext import commands
 from discord import app_commands
 
-from utils.lang_manager import LangManager
-from utils import logger
+from utility.lang_manager import LangManager
+from utility import logger
 from cogs.permissions.is_dev import is_dev
 
 class ClearCache(commands.Cog):

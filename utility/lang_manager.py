@@ -12,12 +12,16 @@ class LangManager:
     def load(self, lang: str) -> dict[str, str]:
         if lang not in self.cache:
             path = os.path.join(self.base_path, f"{lang}.json")
+
             if not os.path.exists(path):
+
                 if lang != self.default_lang:
                     return self.load(self.default_lang)
                 return {}
+            
             with open(path, "r", encoding="utf-8") as f:
                 self.cache[lang] = json.load(f)
+
         return self.cache[lang]
 
     def t(self, lang: str, key: str, **kwargs) -> str:
@@ -34,6 +38,7 @@ class LangManager:
 
         if text is None and lang != self.default_lang:
             return self.t(self.default_lang, key, **kwargs)
+        
         if text is None:
             text = key  # fallback, gdy brak tłumaczenia
 

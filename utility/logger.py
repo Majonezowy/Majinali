@@ -5,8 +5,8 @@ import traceback
 
 from typing import Optional
 
-from utils.lang_manager import LangManager
-from utils.config import load_config
+from utility.lang_manager import LangManager
+from utility.config import load_config
 
 data = load_config()
 def get_level(data):
@@ -100,14 +100,22 @@ async def handle_error(interaction: discord.Interaction, error: app_commands.App
             content = lang_manager.t(locale, "command_not_found")
         else:
             content = lang_manager.t(locale, "error")
-            
-        if member.id == 693544583891517600:
-            content += f"\n{str(error)}"
         
+        # Show traceback only to you (developer)
+        if member.id == 693544583891517600:
+            tb_str = "".join(traceback.format_exception(type(error), error, error.__traceback__))
+            # truncate if too long (Discord max 2000 chars)
+            if len(tb_str) > 1800:
+                tb_str = tb_str[-1800:]
+            content += f"\n```\n{tb_str}\n```"
+
+        # Send the message
         if not interaction.response.is_done():
             await interaction.response.send_message(content, ephemeral=True)
         else:
             await interaction.followup.send(content, ephemeral=True)
+
     except Exception as e:
         logger.error(f"{e}\n{traceback.format_exc()}")
+
         

@@ -1,26 +1,26 @@
 import os
+import os
+
 import sys
 import traceback
 from dotenv import load_dotenv
 
 import discord
 from discord.ext import commands
-from discord import app_commands
 
-from utils.db.db import DatabaseClient
-from utils.db.setup_db import setup_database
+from utility.db.db import DatabaseClient
+from utility.db.setup_db import setup_database
 
-from utils.db.nsql import nSQL
-from utils.config import load_config
+from utility.db.nsql import nSQL
+from utility.config import load_config
 
-from utils.logger import logger
+from utility.logger import logger
 
 # Muzyka
-from utils.music import MusicManager
-from collections import deque
+from utility.music import MusicManager
 
 # Języki
-from utils.lang_manager import LangManager
+from utility.lang_manager import LangManager
 
 load_dotenv()
 TOKEN = os.getenv("DISCORD_TOKEN")
@@ -36,6 +36,9 @@ class Bot(commands.Bot):
         if not self.config:
             logger.error("No config file!")
             self.config = {}
+            
+        self.dev_ids = self.config.get("dev_ids", []) or []
+        self.dev_guild = self.config.get("dev_guild", 0) or 0
         
         # Muzyka
         #self.queue: dict[int, deque] = {} # guild_id -> queue object
@@ -49,6 +52,8 @@ class Bot(commands.Bot):
         self.lang_manager = LangManager()
         
     async def setup_hook(self):
+        await self.__load_ffmepg()
+
         BASE_DIR = os.path.dirname(os.path.abspath(__file__))  # bot/
         COGS_DIR = os.path.join(BASE_DIR, "cogs")
         COMMANDS_DIR = os.path.join(COGS_DIR, "commands")
@@ -89,15 +94,24 @@ class Bot(commands.Bot):
                 except KeyboardInterrupt:
                     sys.exit(-1)
 
+    @staticmethod
+    async def __load_ffmepg() -> None:
+        os.environ["PATH"] = os.path.abspath("bin") + os.pathsep + os.environ["PATH"]
+
     async def on_ready(self):
         assert self.user is not None, "Bot user is not set."
         await self.tree.sync()
         logger.info(f"Bot logged in as {self.user} (ID: {self.user.id})")
 
-    async def close(self):        
+    async def close(self):
+        await self.db.close()
         await super().close()
 
 if __name__ == "__main__":
     bot = Bot()
+    if discord.version_info.minor < 6:
+        logger.error("discord.py version >2.6 required")
+        exit()
+
     logger.info("Starting bot...")
     bot.run(TOKEN)

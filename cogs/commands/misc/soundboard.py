@@ -7,9 +7,9 @@ from bs4 import BeautifulSoup
 import aiohttp
 import asyncio
 
-from utils.music import MusicManager
-from utils.lang_manager import LangManager
-from utils import logger
+from utility.music import MusicManager
+from utility.lang_manager import LangManager
+from utility import logger
 
 class Soundboard(commands.Cog):
     def __init__(self, bot: commands.Bot):

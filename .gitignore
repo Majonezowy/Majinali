@@ -4,6 +4,8 @@ __pycache__
 .venv
 list events
 
+bin
+
 *.old
 *.db
 bot_data.db

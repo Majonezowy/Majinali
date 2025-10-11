@@ -11,7 +11,7 @@ class ClearCache(commands.Cog):
         self.bot = bot
         self.langManager: LangManager = self.bot.lang_manager # type: ignore
 
-    @app_commands.command(name="clear_cache", description="Usuwa cache z językami")
+    @app_commands.command(name="clear_cache", description="Usuwa cache z językami [DEBUG]")
     @is_dev()
     async def clear_cache(self, interaction: discord.Interaction):
         self.langManager.cache = {}        

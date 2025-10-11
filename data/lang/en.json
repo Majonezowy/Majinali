@@ -19,9 +19,20 @@
         "queue_empty": "Empty.",
         "stopped": "Playback stopped."
     },
+
     "soundboard": {
         "playing": "🔊 Successfully played sound.",
         "invalid_url": "❌ Invalid URL to sound!",
         "sound_not_found": "❌ I couldn't find this sound!"
+    },
+
+    "moderation": {
+        "voice": {
+            "move_all": {
+                "no_members": "❌ No members to move on this voice channel!",
+                "channels_not_provided": "❌ You have to provide voice channels!",
+                "members_moved": "All members moved from {before} to {after} in {time}"
+            }
+        }
     }
 }

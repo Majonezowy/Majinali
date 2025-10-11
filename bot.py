@@ -3,7 +3,10 @@ import os
 
 import sys
 import traceback
+from pathlib import Path
 from dotenv import load_dotenv
+
+from typing import Any
 
 import discord
 from discord.ext import commands
@@ -30,15 +33,11 @@ if not TOKEN:
 class Bot(commands.Bot):
     def __init__(self):
         super().__init__(command_prefix=".", intents=discord.Intents.all())
-        self.db = DatabaseClient()
         
-        self.config = load_config()
+        self.config: dict[str, Any] = load_config()
         if not self.config:
             logger.error("No config file!")
             self.config = {}
-            
-        self.dev_ids = self.config.get("dev_ids", []) or []
-        self.dev_guild = self.config.get("dev_guild", 0) or 0
         
         # Muzyka
         #self.queue: dict[int, deque] = {} # guild_id -> queue object
@@ -53,6 +52,7 @@ class Bot(commands.Bot):
         
     async def setup_hook(self):
         await self.__load_ffmepg()
+        await DatabaseClient().init()
 
         BASE_DIR = os.path.dirname(os.path.abspath(__file__))  # bot/
         COGS_DIR = os.path.join(BASE_DIR, "cogs")
@@ -61,7 +61,7 @@ class Bot(commands.Bot):
         CONTEXTS_DIR = os.path.join(COGS_DIR, "contexts")
 
         # inicjalizacja bazy
-        await setup_database(self.db)
+        await setup_database()
 
         await self.__load_cogs(COMMANDS_DIR)
         await self.__load_cogs(EVENTS_DIR) 
@@ -75,24 +75,32 @@ class Bot(commands.Bot):
     #            logger.info(f"Loading {type}: {filename[:-3]}")
     #            await self.load_extension(f"cogs.{type}s.{filename[:-3]}")
 
-    async def __load_cogs(self, base_dir="cogs"):
+    async def __load_cogs(self, base_dir: str = "cogs") -> None:
+        base_dir = os.path.abspath(base_dir)
+        is_dev = self.config.get("type") == "dev"
+
         for root, _, files in os.walk(base_dir):
             for file in files:
                 if not file.endswith(".py") or file.startswith("__"):
                     continue
-                
-                full_path = os.path.join(root, file)
 
-                module = os.path.relpath(full_path, start=".")
-                module = module.replace(os.sep, ".").removesuffix(".py")
+                if not is_dev and "debug" in root.split(os.sep):
+                    continue
+
+                full_path = os.path.join(root, file)
+                rel_path = os.path.relpath(full_path, start=os.path.dirname(__file__))
+
+                module = rel_path.replace(os.sep, ".").removesuffix(".py")
 
                 logger.info(f"Loading cog: {module}")
                 try:
                     await self.load_extension(module)
-                except Exception as e:
-                    logger.error(f"❌ Failed to load {module}: {e}\n{traceback.format_exc()}")
                 except KeyboardInterrupt:
                     sys.exit(-1)
+                except Exception as e:
+                    logger.error(
+                        f"❌ Failed to load {module}: {e}\n{traceback.format_exc()}"
+                    )
 
     @staticmethod
     async def __load_ffmepg() -> None:
@@ -104,7 +112,7 @@ class Bot(commands.Bot):
         logger.info(f"Bot logged in as {self.user} (ID: {self.user.id})")
 
     async def close(self):
-        await self.db.close()
+        await DatabaseClient.close()
         await super().close()
 
 if __name__ == "__main__":
@@ -114,4 +122,8 @@ if __name__ == "__main__":
         exit()
 
     logger.info("Starting bot...")
-    bot.run(TOKEN)
+    
+    try:
+        bot.run(TOKEN)
+    except Exception as e:
+        logger.error(f"❌{e}\n{traceback.format_exc()}")

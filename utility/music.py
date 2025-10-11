@@ -22,6 +22,7 @@ ydl_opts = {
     "format": "bestaudio/best",
     "noplaylist": True
 }
+
 class MusicManager:
     def __init__(self, bot: commands.Bot) -> None:
         self.bot = bot

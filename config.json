@@ -1,6 +1,5 @@
 {
-    "dev_ids": [693544583891517600],
-    "dev_guild": 1388501467626868808,
+    "type": "dev",
 
     "db_type": "sqlite",
     "nsql": "dict",
@@ -8,10 +7,5 @@
     "logging": {
         "level": "DEBUG",
         "file": "bot.log"
-    },
-
-    "features": {
-        "music": true,
-        "fun": false
     }
 }

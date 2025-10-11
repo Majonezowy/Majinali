@@ -4,6 +4,9 @@ from discord import app_commands
 guild_settings: dict[int, dict[str, bool]] = {
     1388501467626868808: {
         "music": True
+    },
+    1410396714518446172: {
+        "music": True
     }
 }
 

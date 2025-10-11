@@ -1,5 +1,8 @@
 1. Modal creator ✅
-1a. System callback'ow
+    - System callback'ow
 2. Ticket creator
-3. Database, musicmanager i langmanager na staticmethod
+3. Database na staticmethod ✅
 4. Langauge keys for feature disabled
+5. Levele
+6. Basic integracja z dashboardem
+7. Custom status bar

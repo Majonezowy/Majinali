@@ -100,16 +100,13 @@ async def handle_error(interaction: discord.Interaction, error: app_commands.App
             content = lang_manager.t(locale, "command_not_found")
         else:
             content = lang_manager.t(locale, "error")
-        
-        # Show traceback only to you (developer)
+
         if member.id == 693544583891517600:
             tb_str = "".join(traceback.format_exception(type(error), error, error.__traceback__))
-            # truncate if too long (Discord max 2000 chars)
             if len(tb_str) > 1800:
                 tb_str = tb_str[-1800:]
             content += f"\n```\n{tb_str}\n```"
 
-        # Send the message
         if not interaction.response.is_done():
             await interaction.response.send_message(content, ephemeral=True)
         else:

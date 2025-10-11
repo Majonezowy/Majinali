@@ -23,5 +23,15 @@
         "playing": "🔊 Pomyśnie odtworzono dźwięk.",
         "invalid_url": "❌ Niepoprawny url do dźwięku!",
         "sound_not_found": "❌ Nie znalazłem dźwięku!"
+    },
+
+    "moderation": {
+        "voice": {
+            "move_all": {
+                "no_members": "❌ Nie ma użytkowników na tym kanale głosowym!",
+                "channels_not_provided": "❌ Musisz podać kanały głosowe!",
+                "members_moved": "Wszyscy użytkownici zostali przenieseni z {before} na {after} w czasie {time}"
+            }
+        }
     }
 }

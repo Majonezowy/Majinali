@@ -7,7 +7,7 @@ from utility.creator import ModalCreator
 data = {
     "title": "Przykład",
     "id-1": {
-        "label": "Tekst na polem1",
+        "label": "Podaj co Wassali robi",
         "placeholder": "Placeholder",
         "style": discord.TextStyle.short,
         "required": True,
@@ -56,16 +56,6 @@ data = {
         "default": "domyslna wartosc",
         "row": None
     },
-    "id-6": {
-        "label": "Tekst na polem3",
-        "placeholder": "Placeholder",
-        "style": discord.TextStyle.short,
-        "required": True,
-        "min_length": 1,
-        "max_length": 4000,
-        "default": "domyslna wartosc",
-        "row": None
-    },
     "on_submit": lambda: ...
 }
 
@@ -74,7 +64,7 @@ class SendTestModal(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
 
-    @app_commands.command(name="send_test_modal", description="Send Test Modal")
+    @app_commands.command(name="send_test_modal", description="Send Test Modal [DEBUG]")
     async def send_test_modal(self, interaction: Interaction):
         await interaction.response.send_modal(ModalCreator(data))
         

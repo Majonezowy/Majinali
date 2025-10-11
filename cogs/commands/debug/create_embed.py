@@ -15,7 +15,7 @@ class Embed(commands.Cog):
         self.bot = bot
         self.langManager = self.bot.lang_manager # type: ignore
 
-    @app_commands.command(name="create_embed", description="Creates an embed.")
+    @app_commands.command(name="create_embed", description="Creates an embed. [DEBUG]")
     @app_commands.describe(
         title="The title of the embed",
         description="The description of the embed",
@@ -30,7 +30,7 @@ class Embed(commands.Cog):
         self, 
         interaction: discord.Interaction,
         title: Optional[str] = "",
-        description: Optional[str] = "",
+        description: Optional[str] = "desc",
         thumbnail: Optional[str] = "",
         author: Optional[str] = "",
         author_icon: Optional[str] = "",

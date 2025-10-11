@@ -10,7 +10,7 @@ class CheckLocate(commands.Cog):
         self.bot = bot
         self.langManager: LangManager = self.bot.lang_manager
 
-    @app_commands.command(name="check_locate", description="Check locate")
+    @app_commands.command(name="check_locate", description="Check locate [DEBUG]")
     async def check_locate(self, interaction: Interaction, lang: Optional[str], key: Optional[str]):
         v = ""
         if key and lang:

@@ -2,8 +2,8 @@ import json
 import traceback
 from typing import Optional
 
-def load_config() -> Optional[dict]:
-    data = None
+def load_config() -> dict:
+    data = {}
     try:
         with open("config.json", "r") as f:
             data = json.load(f)

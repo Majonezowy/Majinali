@@ -15,7 +15,7 @@ class TestDb(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
 
-    @app_commands.command(name="test_db", description="Test Components v2 example")
+    @app_commands.command(name="test_db", description="Test Components v2 example [DEBUG]")
     async def test_db(self, interaction: Interaction):
         view = SettingsView()
         await interaction.response.send_message(

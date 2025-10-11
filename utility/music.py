@@ -81,7 +81,7 @@ class MusicManager:
         if guild_id not in self.stopped:
             self.stopped[guild_id] = False
         if guild_id not in self.volume:
-            self.volume[guild_id] = 0.3
+            self.volume[guild_id] = self.default_volume
             
         async with self.playing_locks[guild_id]:
             if vc.is_playing() or self.stopped[guild_id]:
